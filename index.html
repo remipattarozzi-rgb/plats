@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Plats">
+<title>Répertoire de plats</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f5f1;--fg:#222220;--mu:#8a8a82;--ln:#e8e6df;--cd:#fff;--hi:#e4efe9;--ac:#2f5d50}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151514;--fg:#ececE8;--mu:#8f8f87;--ln:#2c2c29;--cd:#1e1e1c;--hi:#24352f;--ac:#8cc2ae;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151514;--fg:#ececE8;--mu:#8f8f87;--ln:#2c2c29;--cd:#1e1e1c;--hi:#24352f;--ac:#8cc2ae;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.35 -apple-system,"Helvetica Neue",Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+main{max-width:1100px;margin:0 auto;padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{text-align:center;margin-bottom:20px}
+h1{font-size:26px;font-weight:700;margin:0;letter-spacing:-.01em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--mu);font-size:14px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:0 0 22px}
+.nav a{font-size:14px;color:var(--fg);text-decoration:none;background:var(--cd);border:1px solid var(--ln);border-radius:999px;padding:7px 13px}
+.nav a:focus-visible,li:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.grid{columns:300px;column-gap:14px}
+.card{break-inside:avoid;background:var(--cd);border:1px solid var(--ln);border-radius:18px;padding:16px 16px 10px;margin:0 0 14px;scroll-margin-top:12px}
+.card h2{display:flex;align-items:baseline;gap:10px;font-size:17px;margin:0 0 6px;font-weight:650}
+.card h2 small{margin-left:auto;color:var(--mu);font-weight:400;font-size:13px}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:12px 0 2px;font-weight:600}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;gap:10px;align-items:center;padding:9px 8px;margin:0 -8px;border-radius:10px;cursor:pointer;font-size:16px}
+li.on{background:var(--hi);color:var(--ac);font-weight:600}
+.tip{text-align:center;color:var(--mu);font-size:13px;margin:-8px 0 18px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head><body>
+<main>
+<header><h1>Répertoire de plats</h1><p id="cnt"></p></header>
+<div class="nav" id="nav"></div>
+<p class="tip">Touche un plat pour le mettre en évidence</p>
+<div class="grid" id="g"></div>
+</main>
+<script>
+const RAW=`# Poulet
+## En sauce
+Blanquette de poulet
+Poulet à la moutarde
+Poulet au curry
+Poulet aux champignons
+Poulet basquaise
+Poulet Gaston Gérard
+Poulet tikka masala
+## Rôti et au four
+Pilon de poulet
+Poulet en papillote
+Poulet rôti
+Poulet rôti et pommes de terre
+## Pané et rapide
+Cordon bleu
+Escalope milanaise
+Nuggets
+# Bœuf, veau et viande hachée
+## Bœuf
+Bœuf bourguignon
+Bolognaise
+Boulettes kefta
+Chili con carne
+Feuille de brick
+Hachis parmentier
+Steak haché
+Tomates farcies
+## Veau
+Saltimbocca
+Veau marengo
+# Poissons et fruits de mer
+Cabillaud
+Croustibat
+Crevettes
+Limande
+Saumon
+Truite
+# Pâtes et plats italiens
+## Viande et lardons
+Carbonara aux asperges
+Pâtes à la bolognaise
+Pâtes à la carbonara
+Pâtes au brocoli et lardons
+## Poisson et fruits de mer
+Nouilles aux crevettes
+Pâtes au saumon
+Pâtes au thon
+Pâtes aux crevettes
+## Fromage et légumes
+Pâtes à l’ail
+Pâtes au beurre et comté
+Pâtes au gorgonzola
+Pâtes au pesto
+Pâtes aux petits pois
+Petites pâtes aux champignons
+## Farcies et au four
+Cannellonis épinards saumon
+Lasagnes
+Lasagnes bolognaise
+Raviolis au bouillon
+Raviolis du Dauphiné
+Raviolis sauce beurre et sauge
+## Autres
+Bruschetta
+Pizza
+# Riz, risottos et céréales
+## Risottos
+Risotto aux asperges
+Risotto aux champignons
+Risotto aux poireaux
+Risotto parmesan
+## Orzo
+Orzo champignons et petits pois
+Orzo façon pot-au-feu
+Orzo poulet et épinards
+# Plats traditionnels français
+Croûte aux morilles
+Quenelles
+Vol-au-vent
+# Gratins et plats au four
+Gratin dauphinois
+Gratin de crozets
+Gratin de gnocchis au poulet
+Gratin de pâtes
+Gratin de pommes de terre et brocolis
+Gratin de pommes de terre et chou-fleur
+Gratin de raviolis du Dauphiné et courgettes
+Tian de légumes
+# Quiches, tartes et cakes salés
+Cake salé
+Quiche à l’ail des ours
+Quiche au thon
+Quiche aux poireaux et saumon
+Quiche lorraine
+Quiche sans pâte
+Tarte à la courgette
+Tarte à la tomate
+Tarte aux oignons
+# Soupes
+Chorba
+Minestrone
+Ramen
+Soupe à l’oignon
+Soupe de potimarron
+Soupe de tortellinis
+Soupe de vermicelles
+Velouté de champignons
+# Salades et repas froids
+Salade César
+Salade de céleri
+Salade de pâtes au pesto
+Salade de pâtes au thon
+Salade de pommes de terre
+Salade de riz
+Taboulé
+# Œufs et légumes
+## Œufs
+Œuf à la turque
+Omelettes
+Soufflé au fromage
+## Légumes
+Purée
+Ratatouille
+# Fromage, burgers et wraps
+## Fromage à partager
+Camembert rôti
+Croziflette
+Fondue
+Mont d’Or
+Raclette
+## Burgers, wraps et sandwichs
+Bagel
+Baguette farcie
+Burger
+Croque-monsieur
+Wrap
+Wrap façon salade César
+## Crêpes et tartes flambées
+Crêpes
+Flammekueche
+# Spécialités du monde
+Gyoza
+Nems
+Tajine kefta œuf`;
+const KEY="repertoire-plats-selection";
+let saved=new Set();
+try{saved=new Set(JSON.parse(localStorage.getItem(KEY)||"[]"))}catch(e){}
+function persist(){
+  try{localStorage.setItem(KEY,JSON.stringify([...document.querySelectorAll("li.on")].map(li=>li.textContent)))}catch(e){}
+}
+const cats=[];let c=null,s=null,n=0;
+RAW.split("\n").forEach(l=>{
+  if(l.startsWith("## ")){s={t:l.slice(3),i:[]};c.subs.push(s)}
+  else if(l.startsWith("# ")){c={t:l.slice(2),subs:[]};s=null;cats.push(c)}
+  else{
+    if(!s){s={t:"",i:[]};c.subs.push(s)}
+    s.i.push({n:l});n++;
+  }
+});
+const g=document.getElementById("g"),nav=document.getElementById("nav");
+cats.forEach((c,ix)=>{
+  const a=document.createElement("a");a.href="#c"+ix;a.textContent=c.t;nav.appendChild(a);
+  const d=document.createElement("section");d.className="card";d.id="c"+ix;
+  const tot=c.subs.reduce((x,y)=>x+y.i.length,0);
+  let h=`<h2>${c.t}<small>${tot}</small></h2>`;
+  c.subs.forEach(s=>{
+    if(s.t)h+=`<h3>${s.t}</h3>`;
+    h+="<ul>"+s.i.map(i=>`<li${saved.has(i.n)?' class="on"':''}>${i.n}</li>`).join("")+"</ul>";
+  });
+  d.innerHTML=h;g.appendChild(d);
+});
+g.addEventListener("click",e=>{
+  const li=e.target.closest("li");
+  if(li){li.classList.toggle("on");persist()}
+});
+document.getElementById("cnt").textContent=n+" plats · "+cats.length+" catégories";
+</script>
+
+</body></html>
