@@ -43,10 +43,10 @@ html{background:var(--bg);
 body{margin:0;background:transparent;color:var(--fg);font:16px/1.4 var(--f-b);-webkit-tap-highlight-color:transparent;
   padding-block:0 150px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:1080px;margin:0 auto}
-header{margin-top:16px;padding:16px 18px 18px;border-radius:32px;background:color-mix(in srgb,var(--ac) 9%,var(--cd));border:1px solid var(--ln);box-shadow:0 12px 30px -22px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:8px}
+header{margin-top:16px;padding:16px 18px 18px;border-radius:32px;background:color-mix(in srgb,var(--ac) 9%,var(--cd));border:1px solid var(--ln);box-shadow:0 12px 30px -22px rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
 h1{margin:0;font:700 clamp(36px,9.5vw,56px)/1.02 var(--f-d);letter-spacing:-.02em;text-wrap:balance}
 .sub{margin:0;color:var(--mu);font-size:15px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px}
+.top{display:flex;align-items:center;justify-content:center;gap:12px;min-height:36px;width:100%}
 .top h1{flex:1;min-width:0}
 .sws{flex:none;display:flex;align-items:center;gap:8px}
 .vsw{flex:none;position:relative;width:68px;height:32px;padding:0;border-radius:999px;border:1px solid var(--ln);background:var(--cd);cursor:pointer;color:var(--mu)}
@@ -181,7 +181,7 @@ body.edit .head .emo::after{content:"✎";position:absolute;right:-8px;top:-8px;
 .pal{position:relative;flex:none;width:34px;height:34px;padding:0;border:0;border-radius:50%;cursor:pointer;background:conic-gradient(hsl(0 78% 55%),hsl(50 85% 52%),hsl(110 60% 45%),hsl(180 65% 45%),hsl(240 70% 60%),hsl(300 65% 55%),hsl(360 78% 55%))}
 .pal::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 0 2px var(--cd)}
 .pal:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-.palpop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:min(290px,calc(100vw - 32px));display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:22px;background:var(--cd);border:1px solid var(--ln);box-shadow:0 14px 34px -10px rgba(0,0,0,.35)}
+.palpop{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 8px);z-index:30;text-align:left;width:min(290px,calc(100vw - 32px));display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:22px;background:var(--cd);border:1px solid var(--ln);box-shadow:0 14px 34px -10px rgba(0,0,0,.35)}
 .presets{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:6px}
 .presets button{aspect-ratio:1;width:100%;padding:0;border-radius:50%;border:3px solid transparent;background:var(--sw);box-shadow:inset 0 0 0 2px var(--cd);cursor:pointer}
 .presets button[aria-pressed="true"]{border-color:var(--fg)}
@@ -193,9 +193,13 @@ body.edit .head .emo::after{content:"✎";position:absolute;right:-8px;top:-8px;
 .palpop input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--fg)}
 #rh{background:linear-gradient(to right,hsl(0 70% 45%),hsl(60 70% 45%),hsl(120 70% 40%),hsl(180 70% 40%),hsl(240 70% 55%),hsl(300 70% 50%),hsl(360 70% 45%))}
 #rs{background:linear-gradient(to right,hsl(var(--ph,58) 8% 45%),hsl(var(--ph,58) 80% 45%))}
-.kick{font:700 15px var(--f-b);color:var(--ac);min-width:0}
-header .sub{font-size:17px;margin-top:-2px}
-.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.ask{margin:-2px 0 0;padding:4px 10px;border:0;background:none;border-radius:14px;font:500 17px/1.35 var(--f-b);color:var(--mu);cursor:pointer;text-wrap:balance;max-width:34ch}
+.ask:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.ask.swap{animation:rise .35s ease}
+@media (prefers-reduced-motion:reduce){.ask.swap{animation:none}}
+header .banner,header .note{width:100%}
+.tools{width:100%}
+.stats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:4px}
 .st{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;background:var(--cd);border:1px solid var(--ln);font:600 14px var(--f-b);color:var(--fg)}
 .st b{font-weight:700;font-variant-numeric:tabular-nums}
 .st.on{background:var(--ac);border-color:var(--ac);color:var(--on)}
@@ -215,7 +219,6 @@ header .sub{font-size:17px;margin-top:-2px}
 <div class="wrap">
   <header>
     <div class="top">
-      <span class="kick" id="kick"></span>
       <div class="sws">
       <button class="pal" id="pal" type="button" aria-label="Couleur de l’appli" aria-haspopup="true" aria-expanded="false" title="Couleur"></button>
       <div class="palpop" id="palpop" role="group" aria-label="Couleur de l’appli" hidden>
@@ -233,7 +236,7 @@ header .sub{font-size:17px;margin-top:-2px}
       </div>
     </div>
     <h1>Répertoire de plats</h1>
-    <p class="sub" id="ask"></p>
+    <button class="ask" id="ask" type="button" aria-label="Afficher une autre question"></button>
     <div class="stats" id="cnt"><span class="st">Chargement…</span></div>
     <div class="tools">
       <button class="btn main" id="add" type="button">+ Ajouter un plat</button>
@@ -544,29 +547,70 @@ document.addEventListener("click",e=>{if(!accPop.hidden&&!e.target.closest("#pal
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!accPop.hidden)closePal()});
 
 /* ---------- En-tête : message du moment + chiffres ---------- */
-(function greet(){
-  const h=new Date().getHours();
-  let k,q;
-  if(h<5){k="Bonne nuit 🌙";q="Une idée pour demain ?"}
-  else if(h<11){k="Bonjour ☀️";q="Une idée pour ce midi ?"}
-  else if(h<15){k="Bon appétit 🍴";q="Qu’est-ce qu’on mange ce midi ?"}
-  else if(h<18){k="Bon après-midi 🌤️";q="Une idée pour ce soir ?"}
-  else{k="Bonsoir 👋";q="Qu’est-ce qu’on mange ce soir ?"}
-  $("kick").textContent=k;$("ask").textContent=q;
-})();
+const QUESTIONS=[
+"Alors, on se fait plaisir ou on fait semblant d’être raisonnable ? 😏",
+"Faim de loup ou petit creux de chaton ? 🐺",
+"Ton ventre a déjà voté, et toi ? 🗳️",
+"Un plat, deux plats, ou le grand banquet ? 🍽️",
+"Quel plat va faire taire les estomacs ce soir ? 🤫",
+"Si ce soir était un plat, ce serait lequel ? 🔮",
+"On cuisine comme des chefs ou comme des héros fatigués ? 👩‍🍳",
+"Qui a dit que choisir un plat était facile ? 😅",
+"Gratin, quiche ou coup de folie ? 🥧",
+"Le frigo a des idées, et toi ? 🧊",
+"Quel plat mérite d’être le roi de la table ? 👑",
+"Pâtes un jour, pâtes toujours ? 🍝",
+"Alors chef, on prépare quoi ? 🧑‍🍳",
+"Cuisine du cœur ou cuisine du placard ? ❤️",
+"Un petit creux ? Un gros creux ? Un gouffre ? 🕳️",
+"Quel plat sent déjà bon dans ta tête ? 👃",
+"Courage, c’est la décision la plus délicieuse de la journée ! 💪",
+"Et si on mangeait du fromage ? (Réponse : oui.) 🧀",
+"Quel plat te fait dire « ouiii » ? 😍",
+"On épate la galerie ou on se régale sans chichis ? ✨",
+"Ça mijote dans ta tête ? 🍲",
+"Un menu de star ou un plat de survie ? 🌟",
+"Fais-moi rêver : qu’est-ce qu’on déguste ? 🤩",
+"Le plat parfait t’attend… à toi de le trouver ! 🔍",
+"Qui va oser dire « on mange des pâtes » ? 🙋",
+"Ton estomac a envie de quoi, au juste ? 🤔",
+"Aujourd’hui, on vise les étoiles ou les restes ? 🌠",
+"Une petite faim ou une faim de roi ? 🍖",
+"Que dit le chef ? Que dit le ventre ? 🎤",
+"Ce soir, c’est festin ou casse-croûte ? 🥪"];
+/* Nos petits mots à nous : ils reviennent de temps en temps */
+const QUESTIONS_PERSO=[
+"Alors Moumour, on mange quoi ce soir ? 😘",
+"Moumour, tu as faim ? Moi, très. 🍽️",
+"Coquinette, qu’est-ce qui te ferait plaisir ce soir ? 😏",
+"Alors coquinette, on se fait plaisir ? 😋",
+"On va bien se manger ! Mais quoi, Moumour ? 🤤",
+"Ce soir, on va bien se manger… à toi de choisir ! 😋",
+"À toi de choisir, Moumour ! 👀",
+"Coquinette, ton ventre dit quoi ? 🤔",
+"Moumour, un gratin ou un coup de folie ? 🧀",
+"Coquinette, pâtes ou pas pâtes ? 🍝",
+"On va bien se manger : gratin, quiche ou festin ? 🥧",
+"Coquinette et Moumour, à table ! 🍴"];
+let qLast="";
+try{qLast=localStorage.getItem("plats-q")||""}catch(e){}
+function nextQuestion(swap){
+  const pool=Math.random()<0.3?QUESTIONS_PERSO:QUESTIONS;
+  let q;do{q=pool[Math.floor(Math.random()*pool.length)]}while(q===qLast);
+  qLast=q;try{localStorage.setItem("plats-q",q)}catch(e){}
+  $("ask").textContent=q;
+  if(swap)replay($("ask"),"swap");
+}
+$("ask").addEventListener("click",()=>nextQuestion(true));
+nextQuestion(false);
 function paintStats(){
   const box=$("cnt");
-  if(!cs.length){return}
-  const k=chosenDishes().length;
-  const mk=(emoji,n,label,on)=>{
-    const el=document.createElement("span");el.className="st"+(on?" on":"");
-    const b=document.createElement("b");b.textContent=n;
-    el.append(emoji+" ",b," "+label);return el;
-  };
-  const nPlats=cs.reduce((a,c)=>a+c.ids.length,0);
-  const frag=[mk("🍽️",nPlats,nPlats>1?"plats":"plat"),mk("🗂️",cs.length,cs.length>1?"catégories":"catégorie")];
-  if(k)frag.push(mk("✅",k,k>1?"choisis":"choisi",true));
-  box.replaceChildren(...frag);
+  if(!cs.length)return;
+  const n=cs.reduce((a,c)=>a+c.ids.length,0);
+  const el=document.createElement("span");el.className="st";
+  const b=document.createElement("b");b.textContent=n;
+  el.append("🍽️ ",b,n>1?" plats":" plat");
+  box.replaceChildren(el);
 }
 
 let catsCfg=new Map(),plats=new Map(),choix=new Set(),editMode=false,editing=null,seeding=false,cs=[],photo=null;
