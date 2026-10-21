@@ -19,8 +19,10 @@
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
 :root[data-accent]{
-  --ac:hsl(var(--ah) var(--as) 30%);--hi:hsl(var(--ah) calc(var(--as)*.6) 91%);
-  --bg:hsl(var(--ah) calc(var(--as)*.35) 95%);--ln:hsl(var(--ah) calc(var(--as)*.3) 87%);--mu:hsl(var(--ah) calc(var(--as)*.12) 42%)}
+  --ac:hsl(var(--ah) var(--as) 30%);--hi:hsl(var(--ah) calc(var(--as)*.75) 85%);
+  --bg:hsl(var(--ah) calc(var(--as)*.6) 90%);--cd:hsl(var(--ah) calc(var(--as)*.55) 96.5%);
+  --ln:hsl(var(--ah) calc(var(--as)*.4) 80%);--mu:hsl(var(--ah) calc(var(--as)*.18) 38%);
+  --fg:hsl(var(--ah) calc(var(--as)*.45) 12%);--ti:hsl(var(--ah) calc(var(--as)*1.1) 34%)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#121513;--fg:#eceee9;--mu:#99a29b;--ln:#262b27;--cd:#1b1f1c;
   --ac:#8cc2ae;--on:#0f1d18;--hi:#223229;--wa:#f08a7e;
@@ -31,20 +33,21 @@
   --t-s:22%;--t-l:19%;--i-s:48%;--i-l:80%;--d-s:50%;--d-l:62%;color-scheme:dark}
 @media (prefers-color-scheme:dark){
   :root[data-accent]{
-    --ac:hsl(var(--ah) var(--as) 68%);--on:hsl(var(--ah) 40% 10%);--hi:hsl(var(--ah) calc(var(--as)*.45) 16%);
-    --bg:hsl(var(--ah) calc(var(--as)*.2) 7%);--cd:hsl(var(--ah) calc(var(--as)*.2) 10%);
-    --ln:hsl(var(--ah) calc(var(--as)*.2) 16%);--mu:hsl(var(--ah) calc(var(--as)*.15) 62%)}
+    --ac:hsl(var(--ah) var(--as) 68%);--on:hsl(var(--ah) 40% 10%);--hi:hsl(var(--ah) calc(var(--as)*.55) 21%);
+    --bg:hsl(var(--ah) calc(var(--as)*.4) 9%);--cd:hsl(var(--ah) calc(var(--as)*.38) 14%);
+    --ln:hsl(var(--ah) calc(var(--as)*.3) 22%);--mu:hsl(var(--ah) calc(var(--as)*.2) 64%);
+    --fg:hsl(var(--ah) calc(var(--as)*.3) 94%);--ti:hsl(var(--ah) calc(var(--as)*1.05) 76%)}
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{background:var(--bg);
-  background-image:radial-gradient(760px 380px at 92% -60px,color-mix(in srgb,var(--ac) 16%,transparent),transparent 70%),radial-gradient(620px 340px at -8% 40px,color-mix(in srgb,#f0b25e 18%,transparent),transparent 70%);
+  background-image:radial-gradient(760px 380px at 92% -60px,color-mix(in srgb,var(--ac) 26%,transparent),transparent 70%),radial-gradient(620px 340px at -8% 40px,color-mix(in srgb,hsl(calc(var(--ah,58) + 35) var(--as,32%) 62%) 30%,transparent),transparent 70%);
   background-repeat:no-repeat}
 body{margin:0;background:transparent;color:var(--fg);font:16px/1.4 var(--f-b);-webkit-tap-highlight-color:transparent;
   padding-block:0 150px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:1080px;margin:0 auto}
-header{margin-top:16px;padding:16px 18px 18px;border-radius:32px;background:color-mix(in srgb,var(--ac) 9%,var(--cd));border:1px solid var(--ln);box-shadow:0 12px 30px -22px rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
-h1{margin:0;font:700 clamp(36px,9.5vw,56px)/1.02 var(--f-d);letter-spacing:-.02em;text-wrap:balance}
+header{margin-top:16px;padding:16px 18px 18px;border-radius:32px;background:color-mix(in srgb,var(--ac) 16%,var(--cd));border:1px solid var(--ln);box-shadow:0 12px 30px -22px rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+h1{margin:0;color:var(--ti,var(--fg));font:700 clamp(36px,9.5vw,56px)/1.02 var(--f-d);letter-spacing:-.02em;text-wrap:balance}
 .sub{margin:0;color:var(--mu);font-size:15px}
 .top{display:flex;align-items:center;justify-content:center;gap:12px;min-height:36px;width:100%}
 .top h1{flex:1;min-width:0}
@@ -88,6 +91,8 @@ h1{margin:0;font:700 clamp(36px,9.5vw,56px)/1.02 var(--f-d);letter-spacing:-.02e
 .pad{padding:4px 12px 10px}
 h3{display:flex;width:fit-content;max-width:100%;margin:14px 4px 6px;padding:5px 12px;border-radius:999px;font:700 12px/1.2 var(--f-b);letter-spacing:.06em;text-transform:uppercase;background:hsl(var(--h) var(--t-s) var(--t-l));color:hsl(var(--h) var(--i-s) var(--i-l))}
 ul{list-style:none;margin:0;padding:0}
+.pad ul{padding:4px;border-radius:22px;background:color-mix(in srgb,var(--ac) 9%,transparent)}
+.pad{padding:4px 10px 12px}
 .dish{display:flex;align-items:center;gap:12px;width:100%;min-height:46px;border:0;background:transparent;color:var(--fg);font:500 16px/1.25 var(--f-b);text-align:left;padding:10px 10px;border-radius:16px;cursor:pointer}
 .dish .nm{flex:1;min-width:0}
 .dish .ni{flex:none;display:none;font-size:13px;font-weight:600;color:var(--mu)}
