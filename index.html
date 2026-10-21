@@ -574,8 +574,19 @@ function render(){
   $("cnt").textContent=n+" plats · "+cs.length+" catégories";
   const sel=$("fcat"),keep=sel.value;
   sel.textContent="";
-  cs.forEach(c=>{const o=document.createElement("option");o.value=c.t;o.textContent=c.t;sel.appendChild(o)});
-  if(keep&&cs.some(c=>c.t===keep))sel.value=keep;
+  cs.forEach(c=>{
+    const flat=c.subs.length===1&&!c.subs[0].t;
+    if(flat){
+      const o=document.createElement("option");o.value=catKey(c.t,"");o.textContent=c.t;sel.appendChild(o);
+    }else{
+      const og=document.createElement("optgroup");og.label=c.t;
+      c.subs.forEach(sb=>{
+        const o=document.createElement("option");o.value=catKey(c.t,sb.t);o.textContent=sb.t||"Autres";og.appendChild(o);
+      });
+      sel.appendChild(og);
+    }
+  });
+  if(keep&&[...sel.options].some(o=>o.value===keep))sel.value=keep;
   paintOpen();applySelection();
 }
 function paintOpen(){
@@ -700,17 +711,14 @@ $("editToggle").addEventListener("click",()=>{
 
 /* Fenêtre d'ajout / modification */
 function maxOrdre(){let m=0;plats.forEach(p=>{if(p.ordre>m)m=p.ordre});return m}
-function subFor(cat){
-  for(const p of plats.values()){if(p.cat===cat&&p.sub)return "Autres"}
-  return "";
-}
+function catKey(cat,sub){return JSON.stringify([cat,sub||""])}
 function err(msg){const e=$("ferr");e.textContent=msg;e.hidden=!msg}
 function openEditor(id){
   editing=id||null;err("");
   const p=id?plats.get(id):null;
   $("mtitle").textContent=p?"Modifier le plat":"Ajouter un plat";
   $("fnom").value=p?p.nom:"";
-  if(p)$("fcat").value=p.cat;
+  if(p)$("fcat").value=catKey(p.cat,p.sub);
   $("fing").value=p?ingText(p.ing):"";
   photo=p&&p.photo?p.photo:null;paintPhoto();
   $("fdel").hidden=!p;
@@ -762,7 +770,8 @@ document.addEventListener("keydown",e=>{
 $("form").addEventListener("submit",e=>{
   e.preventDefault();
   const nom=$("fnom").value.trim().replace(/\s+/g," ");
-  const cat=$("fcat").value;
+  let cat="",sub="";
+  try{[cat,sub]=JSON.parse($("fcat").value)}catch(e){}
   if(!nom){err("Écris le nom du plat.");return}
   if(!cat){err("Choisis une catégorie.");return}
   const low=nom.toLowerCase();
@@ -773,10 +782,10 @@ $("form").addEventListener("submit",e=>{
   if(editing){
     const old=plats.get(editing);
     if(!old){closeEditor();return}
-    const same=old.cat===cat;
-    setDoc(doc(db,"plats",editing),{nom,cat,sub:same?(old.sub||""):subFor(cat),ordre:same?old.ordre:maxOrdre()+1,ing,photo:photo||null}).catch(showError);
+    const same=old.cat===cat&&(old.sub||"")===sub;
+    setDoc(doc(db,"plats",editing),{nom,cat,sub,ordre:same?old.ordre:maxOrdre()+1,ing,photo:photo||null}).catch(showError);
   }else{
-    setDoc(doc(platsCol),{nom,cat,sub:subFor(cat),ordre:maxOrdre()+1,ing,photo:photo||null}).catch(showError);
+    setDoc(doc(platsCol),{nom,cat,sub,ordre:maxOrdre()+1,ing,photo:photo||null}).catch(showError);
   }
   closeEditor();
 });
