@@ -5,6 +5,7 @@
 <meta name="apple-mobile-web-app-title" content="Plats">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Répertoire de plats</title>
+<script>(function(){var h=58,s=32;try{var a=JSON.parse(localStorage.getItem("plats-accent2")||"null");if(a&&isFinite(a.h)&&isFinite(a.s)){h=Math.min(360,Math.max(0,+a.h));s=Math.min(80,Math.max(8,+a.s))}}catch(e){}var r=document.documentElement;r.style.setProperty("--ah",h);r.style.setProperty("--as",s+"%");r.setAttribute("data-accent","on")})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
@@ -17,6 +18,9 @@
   --f-b:"Figtree",-apple-system,"Helvetica Neue",Arial,sans-serif;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
+:root[data-accent]{
+  --ac:hsl(var(--ah) var(--as) 30%);--hi:hsl(var(--ah) calc(var(--as)*.6) 91%);
+  --bg:hsl(var(--ah) calc(var(--as)*.35) 95%);--ln:hsl(var(--ah) calc(var(--as)*.3) 87%);--mu:hsl(var(--ah) calc(var(--as)*.12) 42%)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#121513;--fg:#eceee9;--mu:#99a29b;--ln:#262b27;--cd:#1b1f1c;
   --ac:#8cc2ae;--on:#0f1d18;--hi:#223229;--wa:#f08a7e;
@@ -25,6 +29,12 @@
   --bg:#121513;--fg:#eceee9;--mu:#99a29b;--ln:#262b27;--cd:#1b1f1c;
   --ac:#8cc2ae;--on:#0f1d18;--hi:#223229;--wa:#f08a7e;
   --t-s:22%;--t-l:19%;--i-s:48%;--i-l:80%;--d-s:50%;--d-l:62%;color-scheme:dark}
+@media (prefers-color-scheme:dark){
+  :root[data-accent]{
+    --ac:hsl(var(--ah) var(--as) 68%);--on:hsl(var(--ah) 40% 10%);--hi:hsl(var(--ah) calc(var(--as)*.45) 16%);
+    --bg:hsl(var(--ah) calc(var(--as)*.2) 7%);--cd:hsl(var(--ah) calc(var(--as)*.2) 10%);
+    --ln:hsl(var(--ah) calc(var(--as)*.2) 16%);--mu:hsl(var(--ah) calc(var(--as)*.15) 62%)}
+}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{background:var(--bg);
@@ -76,7 +86,7 @@ h1{margin:0;font:700 clamp(36px,9.5vw,56px)/1.02 var(--f-d);letter-spacing:-.02e
 .cat.open .body{grid-template-rows:1fr}
 .inner{overflow:hidden;min-height:0}
 .pad{padding:4px 12px 10px}
-h3{margin:14px 6px 4px;font:700 12px var(--f-b);letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
+h3{display:flex;width:fit-content;max-width:100%;margin:14px 4px 6px;padding:5px 12px;border-radius:999px;font:700 12px/1.2 var(--f-b);letter-spacing:.06em;text-transform:uppercase;background:hsl(var(--h) var(--t-s) var(--t-l));color:hsl(var(--h) var(--i-s) var(--i-l))}
 ul{list-style:none;margin:0;padding:0}
 .dish{display:flex;align-items:center;gap:12px;width:100%;min-height:46px;border:0;background:transparent;color:var(--fg);font:500 16px/1.25 var(--f-b);text-align:left;padding:10px 10px;border-radius:16px;cursor:pointer}
 .dish .nm{flex:1;min-width:0}
@@ -154,6 +164,35 @@ a.btn{display:block;text-align:center;text-decoration:none}
 :root[data-theme="dark"] .emo{background:rgba(255,255,255,.08)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .emo{background:rgba(255,255,255,.08)}}
 .ce{font-size:16px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+body.edit .head .emo{position:relative;outline:2px dashed var(--ac);outline-offset:2px;cursor:pointer}
+body.edit .head .emo::after{content:"✎";position:absolute;right:-8px;top:-8px;width:18px;height:18px;border-radius:50%;background:var(--ac);color:var(--on);font:700 11px/18px var(--f-b);text-align:center}
+.cprev{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:20px;background:hsl(var(--h) var(--t-s) var(--t-l));color:hsl(var(--h) var(--i-s) var(--i-l));font:700 19px/1.15 var(--f-d)}
+.cprev b{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.emin{font-size:26px;text-align:center;width:72px;padding:8px}
+.picks,.swatches{display:flex;flex-wrap:wrap;gap:6px}
+.picks button{width:42px;height:42px;border:1px solid var(--ln);border-radius:12px;background:var(--bg);font-size:22px;line-height:1;cursor:pointer;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.swatches button{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;background:hsl(var(--h) 52% 56%);box-shadow:inset 0 0 0 2px var(--cd)}
+.swatches button[aria-pressed="true"]{border-color:var(--fg)}
+.picks button:focus-visible,.swatches button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cat.open h3,.cat.open li,.cat.open .tile{animation:rise .4s ease both;animation-delay:calc(var(--i,0)*40ms)}
+@media (prefers-reduced-motion:reduce){.cat.open h3,.cat.open li,.cat.open .tile{animation:none}}
+.sws{position:relative}
+.pal{position:relative;flex:none;width:34px;height:34px;padding:0;border:0;border-radius:50%;cursor:pointer;background:conic-gradient(hsl(0 78% 55%),hsl(50 85% 52%),hsl(110 60% 45%),hsl(180 65% 45%),hsl(240 70% 60%),hsl(300 65% 55%),hsl(360 78% 55%))}
+.pal::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 0 2px var(--cd)}
+.pal:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.palpop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:min(290px,calc(100vw - 32px));display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:22px;background:var(--cd);border:1px solid var(--ln);box-shadow:0 14px 34px -10px rgba(0,0,0,.35)}
+.presets{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:6px}
+.presets button{aspect-ratio:1;width:100%;padding:0;border-radius:50%;border:3px solid transparent;background:var(--sw);box-shadow:inset 0 0 0 2px var(--cd);cursor:pointer}
+.presets button[aria-pressed="true"]{border-color:var(--fg)}
+.presets button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.palpop input[type=range]{-webkit-appearance:none;appearance:none;display:block;width:100%;height:24px;padding:0;margin:2px 0 6px;border:0;border-radius:999px;cursor:pointer}
+.palpop input[type=range]::-webkit-slider-runnable-track{background:transparent;height:24px}
+.palpop input[type=range]::-moz-range-track{background:transparent;height:24px}
+.palpop input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-1px;border-radius:50%;background:#fff;border:3px solid var(--fg);box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.palpop input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--fg)}
+#rh{background:linear-gradient(to right,hsl(0 70% 45%),hsl(60 70% 45%),hsl(120 70% 40%),hsl(180 70% 40%),hsl(240 70% 55%),hsl(300 70% 50%),hsl(360 70% 45%))}
+#rs{background:linear-gradient(to right,hsl(var(--ph,58) 8% 45%),hsl(var(--ph,58) 80% 45%))}
 @keyframes pop{0%{transform:scale(.3)}55%{transform:scale(1.35)}100%{transform:scale(1)}}
 @keyframes bump{0%{transform:none}30%{transform:translateY(-9px) scale(1.03)}65%{transform:translateY(0) scale(.985)}100%{transform:none}}
 @keyframes tick{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
@@ -169,6 +208,14 @@ a.btn{display:block;text-align:center;text-decoration:none}
     <div class="top">
       <h1>Répertoire de plats</h1>
       <div class="sws">
+      <button class="pal" id="pal" type="button" aria-label="Couleur de l’appli" aria-haspopup="true" aria-expanded="false" title="Couleur"></button>
+      <div class="palpop" id="palpop" role="group" aria-label="Couleur de l’appli" hidden>
+        <div class="presets" id="presets"></div>
+        <label for="rh">Teinte</label>
+        <input type="range" id="rh" min="0" max="360" step="1">
+        <label for="rs">Intensité</label>
+        <input type="range" id="rs" min="8" max="80" step="1">
+      </div>
       <button class="vsw" id="vsw" type="button" role="switch" aria-checked="false" aria-label="Affichage en photos" title="Liste / Photos">
         <span class="kn2"></span>
         <svg class="i-l" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10M3 5h.01M3 10h.01M3 15h.01"/></svg>
@@ -181,6 +228,7 @@ a.btn{display:block;text-align:center;text-decoration:none}
       <button class="btn main" id="add" type="button">+ Ajouter un plat</button>
       <button class="btn" id="editToggle" type="button" aria-pressed="false">Modifier</button>
     </div>
+    <p class="note" id="editHint" hidden>Touche un plat pour le modifier, ou l’emoji d’une catégorie pour changer son nom, son emoji et sa couleur.</p>
     <p class="banner" id="banner" role="alert" hidden>Connexion à la base impossible. Vérifie ta connexion, puis recharge la page.</p>
   </header>
   <div class="bar">
@@ -263,6 +311,26 @@ a.btn{display:block;text-align:center;text-decoration:none}
   </section>
 </div>
 
+<div class="veil" id="cveil" hidden>
+  <form class="modal" id="cform" role="dialog" aria-modal="true" aria-labelledby="ctitle" novalidate>
+    <h2 id="ctitle">Personnaliser la catégorie</h2>
+    <div class="cprev" id="cprev"><span class="emo" id="cpe" aria-hidden="true"></span><b id="cpn"></b></div>
+    <label for="cnom">Nom</label>
+    <input id="cnom" maxlength="60" autocomplete="off" autocapitalize="sentences">
+    <label for="cemo">Emoji</label>
+    <input id="cemo" class="emin" maxlength="12" autocomplete="off" aria-label="Emoji de la catégorie">
+    <div class="picks" id="cpicks"></div>
+    <label>Couleur</label>
+    <div class="swatches" id="cswatch"></div>
+    <p class="err" id="cerr" role="alert" hidden></p>
+    <div class="acts">
+      <button class="btn main" type="submit">Enregistrer</button>
+      <button class="btn" type="button" id="ccancel">Annuler</button>
+    </div>
+    <button class="btn warn" type="button" id="creset">Rétablir le style d’origine</button>
+  </form>
+</div>
+
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getFirestore,collection,doc,onSnapshot,setDoc,writeBatch} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -276,7 +344,7 @@ const app=initializeApp({
   appId:"1:983649991581:web:a0ee50c23c6a229c5f8d74"
 });
 const db=getFirestore(app);
-const platsCol=collection(db,"plats"),choixCol=collection(db,"choix");
+const platsCol=collection(db,"plats"),choixCol=collection(db,"choix"),catsCol=collection(db,"cats");
 const $=id=>document.getElementById(id);
 
 const HUES=[40,355,22,90,270,330,170,205,130,75,45,240,15,150,255,100,300,190];
@@ -436,7 +504,35 @@ async function seed(){
   await b.commit();
 }
 
-let plats=new Map(),choix=new Set(),editMode=false,editing=null,seeding=false,cs=[],photo=null;
+/* ---------- Couleur d'accent : palette + roue (teinte / intensité) ---------- */
+const PRESETS=[["Kaki",58,32],["Marron",25,48],["Terracotta",14,58],["Brique",4,52],["Moutarde",42,68],["Olive",82,36],["Vert sapin",165,33],["Océan",200,52],["Ardoise",215,22],["Prune",320,34],["Lavande",255,42],["Rose",340,50]];
+const accPop=$("palpop"),root=document.documentElement;
+let acc={h:parseFloat(root.style.getPropertyValue("--ah"))||58,s:parseFloat(root.style.getPropertyValue("--as"))||32};
+function applyAccent(save){
+  root.style.setProperty("--ah",acc.h);root.style.setProperty("--as",acc.s+"%");
+  accPop.style.setProperty("--ph",acc.h);
+  $("rh").value=acc.h;$("rs").value=acc.s;
+  $("presets").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.h===acc.h&&+b.dataset.s===acc.s)));
+  if(save){try{localStorage.setItem("plats-accent2",JSON.stringify(acc))}catch(e){}}
+}
+function closePal(){accPop.hidden=true;$("pal").setAttribute("aria-expanded","false")}
+PRESETS.forEach(([nom,h,sat])=>{
+  const b=document.createElement("button");b.type="button";b.dataset.h=h;b.dataset.s=sat;
+  b.style.setProperty("--sw","hsl("+h+" "+sat+"% 42%)");b.setAttribute("aria-label",nom);b.title=nom;
+  b.addEventListener("click",()=>{acc={h,s:sat};applyAccent(true)});
+  $("presets").appendChild(b);
+});
+$("rh").addEventListener("input",e=>{acc.h=+e.target.value;applyAccent(true)});
+$("rs").addEventListener("input",e=>{acc.s=+e.target.value;applyAccent(true)});
+applyAccent(false);
+$("pal").addEventListener("click",e=>{
+  e.stopPropagation();
+  const o=accPop.hidden;accPop.hidden=!o;$("pal").setAttribute("aria-expanded",String(o));
+});
+document.addEventListener("click",e=>{if(!accPop.hidden&&!e.target.closest("#palpop"))closePal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!accPop.hidden)closePal()});
+
+let catsCfg=new Map(),plats=new Map(),choix=new Set(),editMode=false,editing=null,seeding=false,cs=[],photo=null;
 let open=new Set();
 try{open=new Set(JSON.parse(localStorage.getItem("plats-ouverts")||"[]"))}catch(e){}
 let firstRender=true;
@@ -486,6 +582,7 @@ function ingLine(it){
 function ingText(arr){return (arr||[]).map(ingLine).join("\n")}
 function fold(s){return s.replace(/œ/gi,"oe").replace(/æ/gi,"ae").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim()}
 const EMOJIS=[["poulet","🍗"],["boeuf","🥩"],["viande","🥩"],["veau","🥩"],["pate","🍝"],["italien","🍝"],["riz","🍚"],["risotto","🍚"],["tradition","🥘"],["gratin","🥔"],["quiche","🥧"],["tarte","🥧"],["soupe","🍲"],["salade","🥗"],["oeuf","🍳"],["legume","🥦"],["fromage","🧀"],["burger","🍔"],["wrap","🌯"],["monde","🥟"],["poisson","🐟"],["dessert","🍰"],["gateau","🍰"],["apero","🍹"],["pizza","🍕"],["pain","🥖"]];
+function catId(t){return "c_"+encodeURIComponent(fold(t))}
 function emojiFor(t){const f=fold(t);for(const [k,e] of EMOJIS)if(f.includes(k))return e;return "🍽️"}
 function keyName(n){
   return fold(n).split(/\s+/).map(w=>w.length>3&&w.endsWith("s")?w.slice(0,-1):w).join(" ");
@@ -555,12 +652,14 @@ function render(){
   if(firstRender&&open.size===0&&cs.length)open.add(cs[0].t);
   firstRender=false;
   cs.forEach((c,ix)=>{
-    c.h=HUES[ix%HUES.length];
+    const cfg=catsCfg.get(catId(c.t))||{};
+    c.h=typeof cfg.h==="number"?cfg.h:HUES[ix%HUES.length];
+    c.emoji=cfg.emoji||emojiFor(c.t);
     c.ids=c.subs.flatMap(s=>s.items.map(p=>p.id));
     n+=c.ids.length;
     const chip=document.createElement("button");chip.type="button";chip.className="chip";
     chip.style.setProperty("--h",c.h);
-    const ce=document.createElement("span");ce.className="ce";ce.textContent=emojiFor(c.t);
+    const ce=document.createElement("span");ce.className="ce";ce.textContent=c.emoji;
     chip.append(ce,c.t);
     chip.addEventListener("click",()=>{
       open.add(c.t);saveOpen();paintOpen();
@@ -574,14 +673,18 @@ function render(){
     head.setAttribute("aria-controls",bid);
     head.innerHTML='<span class="emo" aria-hidden="true"></span><h2></h2><span class="meta"><span class="sel" hidden></span><span class="tot"></span>'+CHEV+'</span>';
     head.querySelector("h2").textContent=c.t;
-    head.querySelector(".emo").textContent=emojiFor(c.t);
+    head.querySelector(".emo").textContent=c.emoji;
     head.querySelector(".tot").textContent=c.ids.length;
-    head.addEventListener("click",()=>{open.has(c.t)?open.delete(c.t):open.add(c.t);saveOpen();paintOpen()});
+    head.addEventListener("click",e=>{
+      if(editMode&&e.target.closest(".emo")){openCatEditor(c.t);return}
+      open.has(c.t)?open.delete(c.t):open.add(c.t);saveOpen();paintOpen();
+    });
     const body=document.createElement("div");body.className="body";body.id=bid;
     const inner=document.createElement("div");inner.className="inner";
     const pad=document.createElement("div");pad.className="pad";
+    let ai=0;
     c.subs.forEach(sb=>{
-      if(sb.t){const h3=document.createElement("h3");h3.textContent=sb.t;pad.appendChild(h3)}
+      if(sb.t){const h3=document.createElement("h3");h3.textContent=sb.t;h3.style.setProperty("--i",Math.min(ai++,14));pad.appendChild(h3)}
       const withPh=sb.items.filter(p=>p.photo);
       if(withPh.length){
         const tiles=document.createElement("div");tiles.className="tiles";
@@ -590,13 +693,14 @@ function render(){
           const im=document.createElement("img");im.src=p.photo;im.alt="";im.draggable=false;im.decoding="async";
           const ck=document.createElement("span");ck.className="ck";ck.innerHTML=CHECK;
           const tn=document.createElement("span");tn.className="tn";tn.textContent=p.nom;
+          t.style.setProperty("--i",Math.min(ai++,14));
           t.append(im,ck,tn);tiles.appendChild(t);
         });
         pad.appendChild(tiles);
       }
       const ul=document.createElement("ul");
       sb.items.forEach(p=>{
-        const li=document.createElement("li");
+        const li=document.createElement("li");li.style.setProperty("--i",Math.min(ai++,14));
         const b=document.createElement("button");b.type="button";b.className="dish"+(p.photo?" hasphoto":"");b.dataset.id=p.id;
         b.innerHTML='<span class="box">'+CHECK+'</span><span class="nm"></span><span class="ni"></span>';
         if(p.photo){
@@ -785,7 +889,85 @@ $("editToggle").addEventListener("click",()=>{
   document.body.classList.toggle("edit",editMode);
   $("editToggle").setAttribute("aria-pressed",String(editMode));
   $("editToggle").textContent=editMode?"Terminé":"Modifier";
+  $("editHint").hidden=!editMode;
 });
+
+/* ---------- Personnaliser une catégorie (mode Modifier) ---------- */
+const CAT_EMOJIS=["🍗","🥩","🍝","🍚","🥘","🥔","🥧","🍲","🥗","🍳","🥦","🧀","🍔","🌯","🥟","🐟","🍤","🍕","🥖","🍰","🍪","🍹","🥐","🍜","🌮","🥞","🍅","🥕","🍄","🌶️","🧑‍🍳","⭐","❤️","🔥"];
+const CAT_HUES=[355,15,22,40,45,75,90,130,150,170,190,205,240,255,270,300,330];
+let catEditing=null,catHue=0;
+function firstGlyph(v){
+  v=(v||"").trim();if(!v)return "";
+  try{const r=new Intl.Segmenter(undefined,{granularity:"grapheme"}).segment(v)[Symbol.iterator]().next();return r.done?"":r.value.segment}
+  catch(e){return Array.from(v)[0]||""}
+}
+function catErr(m){const e=$("cerr");e.textContent=m;e.hidden=!m}
+function paintCatPreview(){
+  const nom=$("cnom").value.trim()||catEditing||"";
+  $("cprev").style.setProperty("--h",catHue);
+  $("cpn").textContent=nom;
+  $("cpe").textContent=firstGlyph($("cemo").value)||emojiFor(nom);
+  $("cswatch").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.h===catHue)));
+}
+(function buildCatPickers(){
+  const pk=$("cpicks");
+  CAT_EMOJIS.forEach(e=>{
+    const b=document.createElement("button");b.type="button";b.textContent=e;b.setAttribute("aria-label","Emoji "+e);
+    b.addEventListener("click",()=>{$("cemo").value=e;paintCatPreview()});
+    pk.appendChild(b);
+  });
+  const sw=$("cswatch");
+  CAT_HUES.forEach(h=>{
+    const b=document.createElement("button");b.type="button";b.dataset.h=h;b.style.setProperty("--h",h);
+    b.setAttribute("aria-label","Couleur "+h);b.setAttribute("aria-pressed","false");
+    b.addEventListener("click",()=>{catHue=h;paintCatPreview()});
+    sw.appendChild(b);
+  });
+})();
+function openCatEditor(title){
+  const c=cs.find(x=>x.t===title);if(!c)return;
+  catEditing=title;catHue=c.h;
+  const cfg=catsCfg.get(catId(title))||{};
+  $("cnom").value=title;
+  $("cemo").value=cfg.emoji||c.emoji;
+  $("creset").hidden=!catsCfg.has(catId(title));
+  catErr("");paintCatPreview();
+  $("cveil").hidden=false;
+  setTimeout(()=>$("cnom").focus(),30);
+}
+function closeCatEditor(){$("cveil").hidden=true;catEditing=null}
+$("cnom").addEventListener("input",paintCatPreview);
+$("cemo").addEventListener("input",paintCatPreview);
+$("ccancel").addEventListener("click",closeCatEditor);
+$("cform").addEventListener("submit",e=>{
+  e.preventDefault();
+  const old=catEditing;if(old===null)return;
+  const name=$("cnom").value.trim().replace(/\s+/g," ");
+  if(!name){catErr("Écris le nom de la catégorie.");return}
+  if(cs.some(c=>c.t!==old&&fold(c.t)===fold(name))){catErr("Cette catégorie existe déjà.");return}
+  const emoji=firstGlyph($("cemo").value);
+  const batch=writeBatch(db);
+  if(name!==old){
+    plats.forEach(p=>{if(p.cat===old)batch.update(doc(db,"plats",p.id),{cat:name})});
+    if(catId(old)!==catId(name))batch.delete(doc(db,"cats",catId(old)));
+    if(open.delete(old)){open.add(name);saveOpen()}
+  }
+  batch.set(doc(db,"cats",catId(name)),{emoji,h:catHue});
+  batch.commit().catch(showError);
+  closeCatEditor();
+});
+$("creset").addEventListener("click",()=>{
+  if(catEditing===null)return;
+  const batch=writeBatch(db);
+  batch.delete(doc(db,"cats",catId(catEditing)));
+  batch.commit().catch(showError);
+  closeCatEditor();
+});
+onSnapshot(catsCol,snap=>{
+  catsCfg=new Map();
+  snap.forEach(d=>catsCfg.set(d.id,d.data()));
+  if(plats.size)render();
+},e=>console.error(e));
 
 /* Fenêtre d'ajout / modification */
 function maxOrdre(){let m=0;plats.forEach(p=>{if(p.ordre>m)m=p.ordre});return m}
@@ -851,6 +1033,7 @@ $("sveil").addEventListener("click",e=>{if(e.target===$("sveil"))closeShop()});
 document.addEventListener("keydown",e=>{
   if(e.key!=="Escape")return;
   if(!$("pveil").hidden)closeViewer();
+  else if(!$("cveil").hidden)closeCatEditor();
   else if(!$("veil").hidden)closeEditor();
   else if(!$("sveil").hidden)closeShop();
 });
