@@ -179,6 +179,10 @@ body.edit .head .emo::after{content:"✎";position:absolute;right:-8px;top:-8px;
 .swatches button{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;background:hsl(var(--h) 52% 56%);box-shadow:inset 0 0 0 2px var(--cd)}
 .swatches button[aria-pressed="true"]{border-color:var(--fg)}
 .picks button:focus-visible,.swatches button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+/* catégories = couleur du cercle chromatique, sans emojis */
+.cat,.chip,.cprev{--h:var(--ah,58)!important}
+.emo,.ce{display:none!important}
+body.edit .head h2{outline:2px dashed var(--ac);outline-offset:3px;border-radius:6px;cursor:pointer}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .cat.open h3,.cat.open li,.cat.open .tile{animation:rise .4s ease both;animation-delay:calc(var(--i,0)*40ms)}
 @media (prefers-reduced-motion:reduce){.cat.open h3,.cat.open li,.cat.open .tile{animation:none}}
@@ -247,7 +251,7 @@ header .banner,header .note{width:100%}
       <button class="btn main" id="add" type="button">+ Ajouter un plat</button>
       <button class="btn" id="editToggle" type="button" aria-pressed="false">✎ Modifier</button>
     </div>
-    <p class="note" id="editHint" hidden>Touche un plat pour le modifier, ou l’emoji d’une catégorie pour changer son nom, son emoji et sa couleur.</p>
+    <p class="note" id="editHint" hidden>Touche un plat pour le modifier, ou le titre d’une catégorie pour changer son nom.</p>
     <p class="banner" id="banner" role="alert" hidden>Connexion à la base impossible. Vérifie ta connexion, puis recharge la page.</p>
   </header>
   <div class="bar">
@@ -336,11 +340,11 @@ header .banner,header .note{width:100%}
     <div class="cprev" id="cprev"><span class="emo" id="cpe" aria-hidden="true"></span><b id="cpn"></b></div>
     <label for="cnom">Nom</label>
     <input id="cnom" maxlength="60" autocomplete="off" autocapitalize="sentences">
-    <label for="cemo">Emoji</label>
-    <input id="cemo" class="emin" maxlength="12" autocomplete="off" aria-label="Emoji de la catégorie">
-    <div class="picks" id="cpicks"></div>
-    <label>Couleur</label>
-    <div class="swatches" id="cswatch"></div>
+    <label for="cemo" hidden>Emoji</label>
+    <input id="cemo" class="emin" hidden maxlength="12" autocomplete="off" aria-label="Emoji de la catégorie">
+    <div class="picks" id="cpicks" hidden></div>
+    <label hidden>Couleur</label>
+    <div class="swatches" id="cswatch" hidden></div>
     <p class="err" id="cerr" role="alert" hidden></p>
     <div class="acts">
       <button class="btn main" type="submit">Enregistrer</button>
@@ -763,7 +767,7 @@ function render(){
     head.querySelector(".emo").textContent=c.emoji;
     head.querySelector(".tot").textContent=c.ids.length;
     head.addEventListener("click",e=>{
-      if(editMode&&e.target.closest(".emo")){openCatEditor(c.t);return}
+      if(editMode&&e.target.closest("h2")){openCatEditor(c.t);return}
       open.has(c.t)?open.delete(c.t):open.add(c.t);saveOpen();paintOpen();
     });
     const body=document.createElement("div");body.className="body";body.id=bid;
