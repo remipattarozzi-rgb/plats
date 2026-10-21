@@ -180,6 +180,10 @@ a.btn{display:block;text-align:center;text-decoration:none}
     <input id="fnom" maxlength="80" autocomplete="off" autocapitalize="sentences">
     <label for="fcat">Catégorie</label>
     <select id="fcat"></select>
+    <div id="newwrap" hidden>
+      <label for="fnewcat">Nom de la nouvelle catégorie</label>
+      <input id="fnewcat" maxlength="60" autocomplete="off" autocapitalize="sentences" placeholder="Desserts, Apéro…">
+    </div>
     <label for="ffile">Photo</label>
     <div class="photo">
       <div class="ph" id="fph"><span>Aucune photo</span></div>
@@ -244,7 +248,7 @@ const db=getFirestore(app);
 const platsCol=collection(db,"plats"),choixCol=collection(db,"choix");
 const $=id=>document.getElementById(id);
 
-const HUES=[40,355,22,90,270,330,170,205,130,75,45,240];
+const HUES=[40,355,22,90,270,330,170,205,130,75,45,240,15,150,255,100,300,190];
 const CHEV='<svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>';
 const CHECK='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.4l2.4 2.4 4.6-5"/></svg>';
 
@@ -590,7 +594,9 @@ function render(){
       sel.appendChild(og);
     }
   });
+  const on=document.createElement("option");on.value=NEW;on.textContent="＋ Nouvelle catégorie…";sel.appendChild(on);
   if(keep&&[...sel.options].some(o=>o.value===keep))sel.value=keep;
+  toggleNew();
   paintOpen();applySelection();
 }
 function paintOpen(){
@@ -739,6 +745,13 @@ $("editToggle").addEventListener("click",()=>{
 /* Fenêtre d'ajout / modification */
 function maxOrdre(){let m=0;plats.forEach(p=>{if(p.ordre>m)m=p.ordre});return m}
 function catKey(cat,sub){return JSON.stringify([cat,sub||""])}
+const NEW="__new__";
+function toggleNew(){
+  const on=$("fcat").value===NEW;
+  $("newwrap").hidden=!on;
+  if(on&&!$("veil").hidden)setTimeout(()=>$("fnewcat").focus(),30);
+}
+$("fcat").addEventListener("change",()=>{toggleNew();err("")});
 function err(msg){const e=$("ferr");e.textContent=msg;e.hidden=!msg}
 function openEditor(id){
   editing=id||null;err("");
@@ -746,6 +759,7 @@ function openEditor(id){
   $("mtitle").textContent=p?"Modifier le plat":"Ajouter un plat";
   $("fnom").value=p?p.nom:"";
   if(p)$("fcat").value=catKey(p.cat,p.sub);
+  $("fnewcat").value="";toggleNew();
   $("fing").value=p?ingText(p.ing):"";
   photo=p&&p.photo?p.photo:null;paintPhoto();
   $("flien").value=p&&p.lien?p.lien:"";
@@ -799,7 +813,14 @@ $("form").addEventListener("submit",e=>{
   e.preventDefault();
   const nom=$("fnom").value.trim().replace(/\s+/g," ");
   let cat="",sub="";
-  try{[cat,sub]=JSON.parse($("fcat").value)}catch(e){}
+  if($("fcat").value===NEW){
+    cat=$("fnewcat").value.trim().replace(/\s+/g," ");
+    if(!nom){err("Écris le nom du plat.");return}
+    if(!cat){err("Écris le nom de la nouvelle catégorie.");return}
+    if(cs.some(c=>fold(c.t)===fold(cat))){err("Cette catégorie existe déjà. Choisis-la dans la liste.");return}
+  }else{
+    try{[cat,sub]=JSON.parse($("fcat").value)}catch(e){}
+  }
   if(!nom){err("Écris le nom du plat.");return}
   if(!cat){err("Choisis une catégorie.");return}
   const low=nom.toLowerCase();
