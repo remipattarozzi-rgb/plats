@@ -34,6 +34,19 @@ body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 var(--f-b);-web
 header{padding-top:28px;display:flex;flex-direction:column;gap:6px}
 h1{margin:0;font:700 clamp(30px,7vw,44px)/1.05 var(--f-d);letter-spacing:-.02em;text-wrap:balance}
 .sub{margin:0;color:var(--mu);font-size:15px}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.top h1{flex:1;min-width:0}
+.sws{flex:none;display:flex;align-items:center;gap:8px;margin-top:4px}
+.vsw{flex:none;position:relative;width:68px;height:32px;padding:0;border-radius:999px;border:1px solid var(--ln);background:var(--cd);cursor:pointer;color:var(--mu)}
+.vsw .kn2{position:absolute;top:3px;left:3px;width:30px;height:24px;border-radius:999px;background:var(--ac);transition:transform .22s ease}
+.vsw[aria-checked="true"] .kn2{transform:translateX(28px)}
+.vsw svg{position:absolute;top:8px;width:16px;height:16px;transition:color .22s ease}
+.vsw .i-l{left:10px;color:var(--on)}
+.vsw .i-p{right:10px;color:var(--mu)}
+.vsw[aria-checked="true"] .i-l{color:var(--mu)}
+.vsw[aria-checked="true"] .i-p{color:var(--on)}
+.vsw:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.vsw .kn2,.vsw svg{transition:none}}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .tools .btn{flex:0 1 auto}
 .banner{margin:12px 0 0;padding:10px 14px;border-radius:12px;border:1px solid var(--wa);color:var(--wa);font-size:14px}
@@ -140,15 +153,20 @@ a.btn{display:block;text-align:center;text-decoration:none}
 </head><body>
 <div class="wrap">
   <header>
-    <h1>Répertoire de plats</h1>
+    <div class="top">
+      <h1>Répertoire de plats</h1>
+      <div class="sws">
+      <button class="vsw" id="vsw" type="button" role="switch" aria-checked="false" aria-label="Affichage en photos" title="Liste / Photos">
+        <span class="kn2"></span>
+        <svg class="i-l" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10M3 5h.01M3 10h.01M3 15h.01"/></svg>
+        <svg class="i-p" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="3.5" width="15" height="13" rx="2.5"/><circle cx="7.2" cy="8" r="1.3"/><path d="M3 15l4.5-4.5 3.5 3.5 2.5-2.5 3.5 3.5"/></svg>
+      </button>
+      </div>
+    </div>
     <p class="sub" id="cnt">Chargement…</p>
     <div class="tools">
       <button class="btn main" id="add" type="button">+ Ajouter un plat</button>
       <button class="btn" id="editToggle" type="button" aria-pressed="false">Modifier</button>
-      <div class="seg" role="group" aria-label="Affichage">
-        <button id="vList" type="button" aria-pressed="true">Liste</button>
-        <button id="vGrid" type="button" aria-pressed="false">Photos</button>
-      </div>
     </div>
     <p class="banner" id="banner" role="alert" hidden>Connexion à la base impossible. Vérifie ta connexion, puis recharge la page.</p>
   </header>
@@ -717,12 +735,10 @@ let view="list";
 try{view=localStorage.getItem("plats-vue")==="grid"?"grid":"list"}catch(e){}
 function paintView(){
   document.body.classList.toggle("v-grid",view==="grid");
-  $("vList").setAttribute("aria-pressed",String(view!=="grid"));
-  $("vGrid").setAttribute("aria-pressed",String(view==="grid"));
+  $("vsw").setAttribute("aria-checked",String(view==="grid"));
 }
 function setView(v){view=v;try{localStorage.setItem("plats-vue",v)}catch(e){}paintView()}
-$("vList").addEventListener("click",()=>setView("list"));
-$("vGrid").addEventListener("click",()=>setView("grid"));
+$("vsw").addEventListener("click",()=>setView(view==="grid"?"list":"grid"));
 paintView();
 
 /* Clic sur un plat */
