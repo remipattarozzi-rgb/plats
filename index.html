@@ -107,6 +107,33 @@ textarea{resize:vertical;min-height:140px;line-height:1.5}
 .it em{flex:none;font-style:normal;font-weight:700;color:var(--ac);font-variant-numeric:tabular-nums;text-align:right}
 .it small{display:block;color:var(--mu);font-size:13px;font-weight:400;margin-top:1px}
 .note{margin:6px 0 0;padding:10px 12px;border-radius:12px;background:var(--hi);color:var(--fg);font-size:14px}
+.seg{display:flex;flex:1 1 100%;border:1px solid var(--ln);border-radius:12px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--cd);color:var(--fg);font:600 15px var(--f-b);padding:12px 14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--ln)}
+.seg button[aria-pressed="true"]{background:var(--hi);color:var(--ac)}
+.seg button:focus-visible{outline:2px solid var(--ac);outline-offset:-2px}
+.dish,.tile{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.dish .th{flex:none;width:42px;height:42px;border-radius:11px;object-fit:cover;pointer-events:none;background:var(--bg)}
+.tiles{display:none;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px 10px;padding:8px 4px 10px}
+body.v-grid .tiles{display:grid}
+body.v-grid .dish.hasphoto{display:none}
+.tile{position:relative;display:flex;flex-direction:column;gap:6px;border:0;background:transparent;padding:0;text-align:left;color:var(--fg);cursor:pointer;border-radius:14px;font:600 14px/1.2 var(--f-b)}
+.tile img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;display:block;border:3px solid transparent;pointer-events:none;background:var(--bg)}
+.tile .tn{padding:0 2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.tile .ck{position:absolute;top:9px;right:9px;width:24px;height:24px;border-radius:50%;background:var(--ac);color:var(--on);display:none;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.tile .ck svg{width:12px;height:12px}
+.tile[aria-pressed="true"] img{border-color:var(--ac)}
+.tile[aria-pressed="true"] .ck{display:grid}
+body.edit .tile[aria-pressed="true"] img{border-color:transparent}
+body.edit .tile[aria-pressed="true"] .ck{display:none}
+.tile:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+.photo{display:flex;gap:12px;align-items:center}
+.ph{flex:none;width:92px;height:92px;border-radius:14px;background:var(--bg);border:1px dashed var(--ln);display:grid;place-items:center;overflow:hidden;color:var(--mu);font-size:12px;text-align:center;padding:4px}
+.ph img{width:100%;height:100%;object-fit:cover;display:block;margin:-4px}
+.phb{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.viewer{width:100%;max-width:520px;margin:0;background:var(--cd);border:1px solid var(--ln);border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:10px;max-height:100%;overflow-y:auto}
+.viewer img{width:100%;max-height:62vh;object-fit:contain;border-radius:14px;background:var(--bg);display:block}
+.viewer figcaption{font:700 20px var(--f-d);padding:2px 4px}
 @media (prefers-reduced-motion:reduce){.body,.chev,.box,.box svg{transition:none}}
 </style>
 </head><body>
@@ -117,6 +144,10 @@ textarea{resize:vertical;min-height:140px;line-height:1.5}
     <div class="tools">
       <button class="btn main" id="add" type="button">+ Ajouter un plat</button>
       <button class="btn" id="editToggle" type="button" aria-pressed="false">Modifier</button>
+      <div class="seg" role="group" aria-label="Affichage">
+        <button id="vList" type="button" aria-pressed="true">Liste</button>
+        <button id="vGrid" type="button" aria-pressed="false">Photos</button>
+      </div>
     </div>
     <p class="banner" id="banner" role="alert" hidden>Connexion à la base impossible. Vérifie ta connexion, puis recharge la page.</p>
   </header>
@@ -148,6 +179,15 @@ textarea{resize:vertical;min-height:140px;line-height:1.5}
     <input id="fnom" maxlength="80" autocomplete="off" autocapitalize="sentences">
     <label for="fcat">Catégorie</label>
     <select id="fcat"></select>
+    <label for="ffile">Photo</label>
+    <div class="photo">
+      <div class="ph" id="fph"><span>Aucune photo</span></div>
+      <div class="phb">
+        <button class="btn" type="button" id="fpick">Prendre ou choisir une photo</button>
+        <button class="btn warn" type="button" id="fpdel" hidden>Retirer la photo</button>
+      </div>
+      <input type="file" id="ffile" accept="image/*" hidden>
+    </div>
     <label for="fing">Ingrédients</label>
     <textarea id="fing" autocapitalize="sentences" spellcheck="false" placeholder="Lardons : 200 g&#10;Crème : 20 cl&#10;Oignon : 1&#10;Sel"></textarea>
     <p class="help">Un ingrédient par ligne, sous la forme « nom : quantité ». La quantité est facultative.</p>
@@ -158,6 +198,17 @@ textarea{resize:vertical;min-height:140px;line-height:1.5}
     </div>
     <button class="btn warn" type="button" id="fdel" hidden>Supprimer ce plat</button>
   </form>
+</div>
+
+<div class="veil" id="pveil" hidden>
+  <figure class="viewer" role="dialog" aria-modal="true" aria-labelledby="pcap">
+    <img id="pimg" alt="">
+    <figcaption id="pcap"></figcaption>
+    <div class="acts">
+      <button class="btn main" id="ppick" type="button">Ajouter à la liste</button>
+      <button class="btn" id="pclose" type="button">Fermer</button>
+    </div>
+  </figure>
 </div>
 
 <div class="veil" id="sveil" hidden>
@@ -346,7 +397,7 @@ async function seed(){
   await b.commit();
 }
 
-let plats=new Map(),choix=new Set(),editMode=false,editing=null,seeding=false,cs=[];
+let plats=new Map(),choix=new Set(),editMode=false,editing=null,seeding=false,cs=[],photo=null;
 let open=new Set();
 try{open=new Set(JSON.parse(localStorage.getItem("plats-ouverts")||"[]"))}catch(e){}
 let firstRender=true;
@@ -488,11 +539,27 @@ function render(){
     const pad=document.createElement("div");pad.className="pad";
     c.subs.forEach(sb=>{
       if(sb.t){const h3=document.createElement("h3");h3.textContent=sb.t;pad.appendChild(h3)}
+      const withPh=sb.items.filter(p=>p.photo);
+      if(withPh.length){
+        const tiles=document.createElement("div");tiles.className="tiles";
+        withPh.forEach(p=>{
+          const t=document.createElement("button");t.type="button";t.className="tile";t.dataset.id=p.id;
+          const im=document.createElement("img");im.src=p.photo;im.alt="";im.draggable=false;im.decoding="async";
+          const ck=document.createElement("span");ck.className="ck";ck.innerHTML=CHECK;
+          const tn=document.createElement("span");tn.className="tn";tn.textContent=p.nom;
+          t.append(im,ck,tn);tiles.appendChild(t);
+        });
+        pad.appendChild(tiles);
+      }
       const ul=document.createElement("ul");
       sb.items.forEach(p=>{
         const li=document.createElement("li");
-        const b=document.createElement("button");b.type="button";b.className="dish";b.dataset.id=p.id;
+        const b=document.createElement("button");b.type="button";b.className="dish"+(p.photo?" hasphoto":"");b.dataset.id=p.id;
         b.innerHTML='<span class="box">'+CHECK+'</span><span class="nm"></span><span class="ni"></span>';
+        if(p.photo){
+          const th=document.createElement("img");th.className="th";th.src=p.photo;th.alt="";th.draggable=false;th.decoding="async";
+          b.insertBefore(th,b.querySelector(".nm"));
+        }
         b.querySelector(".nm").textContent=p.nom;
         const k=(p.ing||[]).length;
         b.querySelector(".ni").textContent=k?k+" ingr.":"+ ingrédients";
@@ -531,7 +598,7 @@ function chosenDishes(){
   return out;
 }
 function applySelection(){
-  document.querySelectorAll("#g .dish").forEach(b=>b.setAttribute("aria-pressed",String(choix.has(b.dataset.id))));
+  document.querySelectorAll("#g [data-id]").forEach(b=>b.setAttribute("aria-pressed",String(choix.has(b.dataset.id))));
   cs.forEach(c=>{
     const k=c.ids.filter(id=>choix.has(id)).length;
     const el=c.head.querySelector(".sel");el.hidden=k===0;el.textContent=k;
@@ -578,9 +645,46 @@ onSnapshot(choixCol,snap=>{
   applySelection();
 },showError);
 
+/* Appui long : photo en grand */
+let lpT=null,lpFired=false,lpX=0,lpY=0;
+const gridEl=$("g");
+gridEl.addEventListener("pointerdown",e=>{
+  const b=e.target.closest("[data-id]");if(!b||editMode)return;
+  const p=plats.get(b.dataset.id);if(!p||!p.photo)return;
+  lpFired=false;lpX=e.clientX;lpY=e.clientY;clearTimeout(lpT);
+  lpT=setTimeout(()=>{lpFired=true;openViewer(b.dataset.id)},450);
+});
+["pointerup","pointercancel","pointerleave"].forEach(t=>gridEl.addEventListener(t,()=>clearTimeout(lpT)));
+gridEl.addEventListener("pointermove",e=>{if(lpT&&Math.hypot(e.clientX-lpX,e.clientY-lpY)>10)clearTimeout(lpT)});
+gridEl.addEventListener("contextmenu",e=>{if(e.target.closest("[data-id]"))e.preventDefault()});
+function openViewer(id){
+  const p=plats.get(id);if(!p||!p.photo)return;
+  $("pimg").src=p.photo;$("pimg").alt=p.nom;$("pcap").textContent=p.nom;
+  const b=$("ppick");b.dataset.id=id;b.textContent=choix.has(id)?"Retirer de la liste":"Ajouter à la liste";
+  $("pveil").hidden=false;
+}
+function closeViewer(){$("pveil").hidden=true}
+$("pclose").addEventListener("click",closeViewer);
+$("pveil").addEventListener("click",e=>{if(e.target===$("pveil"))closeViewer()});
+$("ppick").addEventListener("click",()=>{const id=$("ppick").dataset.id;setChoice(id,!choix.has(id));closeViewer()});
+
+/* Affichage Liste / Photos */
+let view="list";
+try{view=localStorage.getItem("plats-vue")==="grid"?"grid":"list"}catch(e){}
+function paintView(){
+  document.body.classList.toggle("v-grid",view==="grid");
+  $("vList").setAttribute("aria-pressed",String(view!=="grid"));
+  $("vGrid").setAttribute("aria-pressed",String(view==="grid"));
+}
+function setView(v){view=v;try{localStorage.setItem("plats-vue",v)}catch(e){}paintView()}
+$("vList").addEventListener("click",()=>setView("list"));
+$("vGrid").addEventListener("click",()=>setView("grid"));
+paintView();
+
 /* Clic sur un plat */
 $("g").addEventListener("click",e=>{
-  const b=e.target.closest(".dish");if(!b)return;
+  const b=e.target.closest("[data-id]");if(!b)return;
+  if(lpFired){lpFired=false;return}
   const id=b.dataset.id;
   if(editMode){openEditor(id);return}
   setChoice(id,!choix.has(id));
@@ -608,20 +712,52 @@ function openEditor(id){
   $("fnom").value=p?p.nom:"";
   if(p)$("fcat").value=p.cat;
   $("fing").value=p?ingText(p.ing):"";
+  photo=p&&p.photo?p.photo:null;paintPhoto();
   $("fdel").hidden=!p;
   const d=$("fdel");d.textContent="Supprimer ce plat";delete d.dataset.armed;
   $("veil").hidden=false;
   if(!p)setTimeout(()=>$("fnom").focus(),30);
 }
 function closeEditor(){$("veil").hidden=true;editing=null}
+function paintPhoto(){
+  const box=$("fph");box.textContent="";
+  if(photo){const im=document.createElement("img");im.src=photo;im.alt="";box.appendChild(im)}
+  else{const sp=document.createElement("span");sp.textContent="Aucune photo";box.appendChild(sp)}
+  $("fpdel").hidden=!photo;
+  $("fpick").textContent=photo?"Changer la photo":"Prendre ou choisir une photo";
+}
+/* Réduit la photo (600 px max, JPEG) pour qu'elle reste légère */
+function shrink(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file),im=new Image();
+    im.onload=()=>{
+      const M=600;let w=im.naturalWidth,h=im.naturalHeight;
+      const k=Math.min(1,M/Math.max(w,h));w=Math.max(1,Math.round(w*k));h=Math.max(1,Math.round(h*k));
+      const c=document.createElement("canvas");c.width=w;c.height=h;
+      c.getContext("2d").drawImage(im,0,0,w,h);
+      URL.revokeObjectURL(url);res(c.toDataURL("image/jpeg",0.72));
+    };
+    im.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("image"))};
+    im.src=url;
+  });
+}
+$("fpick").addEventListener("click",()=>$("ffile").click());
+$("fpdel").addEventListener("click",()=>{photo=null;paintPhoto()});
+$("ffile").addEventListener("change",async()=>{
+  const f=$("ffile").files[0];$("ffile").value="";
+  if(!f)return;
+  try{photo=await shrink(f);err("");paintPhoto()}
+  catch(e){err("Photo illisible. Essaie une autre photo.")}
+});
 $("add").addEventListener("click",()=>openEditor(null));
 $("fcancel").addEventListener("click",closeEditor);
 $("veil").addEventListener("click",e=>{if(e.target===$("veil"))closeEditor()});
 $("sveil").addEventListener("click",e=>{if(e.target===$("sveil"))closeShop()});
 document.addEventListener("keydown",e=>{
   if(e.key!=="Escape")return;
-  if(!$("veil").hidden)closeEditor();
-  if(!$("sveil").hidden)closeShop();
+  if(!$("pveil").hidden)closeViewer();
+  else if(!$("veil").hidden)closeEditor();
+  else if(!$("sveil").hidden)closeShop();
 });
 $("form").addEventListener("submit",e=>{
   e.preventDefault();
@@ -638,9 +774,9 @@ $("form").addEventListener("submit",e=>{
     const old=plats.get(editing);
     if(!old){closeEditor();return}
     const same=old.cat===cat;
-    setDoc(doc(db,"plats",editing),{nom,cat,sub:same?(old.sub||""):subFor(cat),ordre:same?old.ordre:maxOrdre()+1,ing}).catch(showError);
+    setDoc(doc(db,"plats",editing),{nom,cat,sub:same?(old.sub||""):subFor(cat),ordre:same?old.ordre:maxOrdre()+1,ing,photo:photo||null}).catch(showError);
   }else{
-    setDoc(doc(platsCol),{nom,cat,sub:subFor(cat),ordre:maxOrdre()+1,ing}).catch(showError);
+    setDoc(doc(platsCol),{nom,cat,sub:subFor(cat),ordre:maxOrdre()+1,ing,photo:photo||null}).catch(showError);
   }
   closeEditor();
 });
