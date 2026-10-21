@@ -43,12 +43,12 @@ html{background:var(--bg);
 body{margin:0;background:transparent;color:var(--fg);font:16px/1.4 var(--f-b);-webkit-tap-highlight-color:transparent;
   padding-block:0 150px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:1080px;margin:0 auto}
-header{padding-top:28px;display:flex;flex-direction:column;gap:6px}
+header{margin-top:16px;padding:16px 18px 18px;border-radius:32px;background:color-mix(in srgb,var(--ac) 9%,var(--cd));border:1px solid var(--ln);box-shadow:0 12px 30px -22px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:8px}
 h1{margin:0;font:700 clamp(36px,9.5vw,56px)/1.02 var(--f-d);letter-spacing:-.02em;text-wrap:balance}
 .sub{margin:0;color:var(--mu);font-size:15px}
-.top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px}
 .top h1{flex:1;min-width:0}
-.sws{flex:none;display:flex;align-items:center;gap:8px;margin-top:4px}
+.sws{flex:none;display:flex;align-items:center;gap:8px}
 .vsw{flex:none;position:relative;width:68px;height:32px;padding:0;border-radius:999px;border:1px solid var(--ln);background:var(--cd);cursor:pointer;color:var(--mu)}
 .vsw .kn2{position:absolute;top:3px;left:3px;width:30px;height:24px;border-radius:999px;background:var(--ac);transition:transform .22s ease}
 .vsw[aria-checked="true"] .kn2{transform:translateX(28px)}
@@ -193,6 +193,15 @@ body.edit .head .emo::after{content:"✎";position:absolute;right:-8px;top:-8px;
 .palpop input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--fg)}
 #rh{background:linear-gradient(to right,hsl(0 70% 45%),hsl(60 70% 45%),hsl(120 70% 40%),hsl(180 70% 40%),hsl(240 70% 55%),hsl(300 70% 50%),hsl(360 70% 45%))}
 #rs{background:linear-gradient(to right,hsl(var(--ph,58) 8% 45%),hsl(var(--ph,58) 80% 45%))}
+.kick{font:700 15px var(--f-b);color:var(--ac);min-width:0}
+header .sub{font-size:17px;margin-top:-2px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.st{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;background:var(--cd);border:1px solid var(--ln);font:600 14px var(--f-b);color:var(--fg)}
+.st b{font-weight:700;font-variant-numeric:tabular-nums}
+.st.on{background:var(--ac);border-color:var(--ac);color:var(--on)}
+.tools{gap:10px;margin-top:8px}
+.tools .btn{flex:1 1 0;padding:14px 16px;border-radius:18px;font-size:16px;font-weight:700}
+.tools .btn.main{flex:1.6 1 0}
 @keyframes pop{0%{transform:scale(.3)}55%{transform:scale(1.35)}100%{transform:scale(1)}}
 @keyframes bump{0%{transform:none}30%{transform:translateY(-9px) scale(1.03)}65%{transform:translateY(0) scale(.985)}100%{transform:none}}
 @keyframes tick{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
@@ -206,7 +215,7 @@ body.edit .head .emo::after{content:"✎";position:absolute;right:-8px;top:-8px;
 <div class="wrap">
   <header>
     <div class="top">
-      <h1>Répertoire de plats</h1>
+      <span class="kick" id="kick"></span>
       <div class="sws">
       <button class="pal" id="pal" type="button" aria-label="Couleur de l’appli" aria-haspopup="true" aria-expanded="false" title="Couleur"></button>
       <div class="palpop" id="palpop" role="group" aria-label="Couleur de l’appli" hidden>
@@ -223,10 +232,12 @@ body.edit .head .emo::after{content:"✎";position:absolute;right:-8px;top:-8px;
       </button>
       </div>
     </div>
-    <p class="sub" id="cnt">Chargement…</p>
+    <h1>Répertoire de plats</h1>
+    <p class="sub" id="ask"></p>
+    <div class="stats" id="cnt"><span class="st">Chargement…</span></div>
     <div class="tools">
       <button class="btn main" id="add" type="button">+ Ajouter un plat</button>
-      <button class="btn" id="editToggle" type="button" aria-pressed="false">Modifier</button>
+      <button class="btn" id="editToggle" type="button" aria-pressed="false">✎ Modifier</button>
     </div>
     <p class="note" id="editHint" hidden>Touche un plat pour le modifier, ou l’emoji d’une catégorie pour changer son nom, son emoji et sa couleur.</p>
     <p class="banner" id="banner" role="alert" hidden>Connexion à la base impossible. Vérifie ta connexion, puis recharge la page.</p>
@@ -532,6 +543,32 @@ $("pal").addEventListener("click",e=>{
 document.addEventListener("click",e=>{if(!accPop.hidden&&!e.target.closest("#palpop"))closePal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!accPop.hidden)closePal()});
 
+/* ---------- En-tête : message du moment + chiffres ---------- */
+(function greet(){
+  const h=new Date().getHours();
+  let k,q;
+  if(h<5){k="Bonne nuit 🌙";q="Une idée pour demain ?"}
+  else if(h<11){k="Bonjour ☀️";q="Une idée pour ce midi ?"}
+  else if(h<15){k="Bon appétit 🍴";q="Qu’est-ce qu’on mange ce midi ?"}
+  else if(h<18){k="Bon après-midi 🌤️";q="Une idée pour ce soir ?"}
+  else{k="Bonsoir 👋";q="Qu’est-ce qu’on mange ce soir ?"}
+  $("kick").textContent=k;$("ask").textContent=q;
+})();
+function paintStats(){
+  const box=$("cnt");
+  if(!cs.length){return}
+  const k=chosenDishes().length;
+  const mk=(emoji,n,label,on)=>{
+    const el=document.createElement("span");el.className="st"+(on?" on":"");
+    const b=document.createElement("b");b.textContent=n;
+    el.append(emoji+" ",b," "+label);return el;
+  };
+  const nPlats=cs.reduce((a,c)=>a+c.ids.length,0);
+  const frag=[mk("🍽️",nPlats,nPlats>1?"plats":"plat"),mk("🗂️",cs.length,cs.length>1?"catégories":"catégorie")];
+  if(k)frag.push(mk("✅",k,k>1?"choisis":"choisi",true));
+  box.replaceChildren(...frag);
+}
+
 let catsCfg=new Map(),plats=new Map(),choix=new Set(),editMode=false,editing=null,seeding=false,cs=[],photo=null;
 let open=new Set();
 try{open=new Set(JSON.parse(localStorage.getItem("plats-ouverts")||"[]"))}catch(e){}
@@ -719,7 +756,7 @@ function render(){
     c.el=sec;c.head=head;c.inner=inner;
   });
   g.replaceChildren(gFrag);nav.replaceChildren(nFrag);
-  $("cnt").textContent=n+" plats · "+cs.length+" catégories";
+  paintStats();
   const sel=$("fcat"),keep=sel.value;
   sel.textContent="";
   cs.forEach(c=>{
@@ -781,6 +818,7 @@ function listText(){return "Nos plats :\n"+chosenDishes().map(p=>"- "+p.nom).joi
 
 function refreshDock(){
   const items=chosenDishes(),k=items.length;
+  paintStats();
   $("dock").hidden=k===0;
   if(k===0){$("sheet").hidden=true;$("toggle").setAttribute("aria-expanded","false");$("hint").textContent="Voir la liste"}
   $("count").textContent=k+" plat"+(k>1?"s":"")+" choisi"+(k>1?"s":"");
@@ -892,7 +930,7 @@ $("editToggle").addEventListener("click",()=>{
   editMode=!editMode;
   document.body.classList.toggle("edit",editMode);
   $("editToggle").setAttribute("aria-pressed",String(editMode));
-  $("editToggle").textContent=editMode?"Terminé":"Modifier";
+  $("editToggle").textContent=editMode?"✓ Terminé":"✎ Modifier";
   $("editHint").hidden=!editMode;
 });
 
