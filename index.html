@@ -133,6 +133,7 @@ body.edit .tile[aria-pressed="true"] .ck{display:none}
 .phb{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
 .viewer{width:100%;max-width:520px;margin:0;background:var(--cd);border:1px solid var(--ln);border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:10px;max-height:100%;overflow-y:auto}
 .viewer img{width:100%;max-height:62vh;object-fit:contain;border-radius:14px;background:var(--bg);display:block}
+a.btn{display:block;text-align:center;text-decoration:none}
 .viewer figcaption{font:700 20px var(--f-d);padding:2px 4px}
 @media (prefers-reduced-motion:reduce){.body,.chev,.box,.box svg{transition:none}}
 </style>
@@ -188,6 +189,8 @@ body.edit .tile[aria-pressed="true"] .ck{display:none}
       </div>
       <input type="file" id="ffile" accept="image/*" hidden>
     </div>
+    <label for="flien">Lien de la recette (facultatif)</label>
+    <input id="flien" type="url" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="500" placeholder="Colle un lien Instagram, TikTok…">
     <label for="fing">Ingrédients</label>
     <textarea id="fing" autocapitalize="sentences" spellcheck="false" placeholder="Lardons : 200 g&#10;Crème : 20 cl&#10;Oignon : 1&#10;Sel"></textarea>
     <p class="help">Un ingrédient par ligne, sous la forme « nom : quantité ». La quantité est facultative.</p>
@@ -205,6 +208,7 @@ body.edit .tile[aria-pressed="true"] .ck{display:none}
     <img id="pimg" alt="">
     <figcaption id="pcap"></figcaption>
     <div class="acts">
+      <a class="btn main full" id="plink" target="_blank" rel="noopener noreferrer" hidden>Voir la recette</a>
       <button class="btn main" id="ppick" type="button">Ajouter à la liste</button>
       <button class="btn" id="pclose" type="button">Fermer</button>
     </div>
@@ -660,21 +664,44 @@ onSnapshot(choixCol,snap=>{
 let lpT=null,lpFired=false,lpX=0,lpY=0;
 const gridEl=$("g");
 gridEl.addEventListener("pointerdown",e=>{
+  lpFired=false;clearTimeout(lpT);
   const b=e.target.closest("[data-id]");if(!b||editMode)return;
-  const p=plats.get(b.dataset.id);if(!p||!p.photo)return;
-  lpFired=false;lpX=e.clientX;lpY=e.clientY;clearTimeout(lpT);
+  const p=plats.get(b.dataset.id);if(!p||!(p.photo||p.lien))return;
+  lpX=e.clientX;lpY=e.clientY;
   lpT=setTimeout(()=>{lpFired=true;openViewer(b.dataset.id)},450);
 });
 ["pointerup","pointercancel","pointerleave"].forEach(t=>gridEl.addEventListener(t,()=>clearTimeout(lpT)));
 gridEl.addEventListener("pointermove",e=>{if(lpT&&Math.hypot(e.clientX-lpX,e.clientY-lpY)>10)clearTimeout(lpT)});
 gridEl.addEventListener("contextmenu",e=>{if(e.target.closest("[data-id]"))e.preventDefault()});
+function siteName(u){
+  let h="";
+  try{h=new URL(u).hostname.replace(/^(www|m|vm|vt)\./,"").toLowerCase()}catch(e){return "le lien"}
+  if(h.includes("instagram"))return "Instagram";
+  if(h.includes("tiktok"))return "TikTok";
+  if(h.includes("youtube")||h==="youtu.be")return "YouTube";
+  if(h.includes("facebook")||h==="fb.watch")return "Facebook";
+  if(h.includes("pinterest")||h==="pin.it")return "Pinterest";
+  if(h.includes("marmiton"))return "Marmiton";
+  return h;
+}
+function cleanUrl(t){
+  t=(t||"").trim();if(!t)return "";
+  if(!/^https?:\/\//i.test(t))t="https://"+t;
+  try{const u=new URL(t);if(!/^https?:$/.test(u.protocol)||!u.hostname.includes("."))return null;return u.href}
+  catch(e){return null}
+}
 function openViewer(id){
-  const p=plats.get(id);if(!p||!p.photo)return;
-  $("pimg").src=p.photo;$("pimg").alt=p.nom;$("pcap").textContent=p.nom;
+  const p=plats.get(id);if(!p||!(p.photo||p.lien))return;
+  const im=$("pimg");
+  if(p.photo){im.src=p.photo;im.alt=p.nom;im.hidden=false}else{im.removeAttribute("src");im.hidden=true}
+  $("pcap").textContent=p.nom;
+  const a=$("plink");
+  if(p.lien){a.href=p.lien;a.textContent="Voir la recette sur "+siteName(p.lien);a.hidden=false}
+  else{a.removeAttribute("href");a.hidden=true}
   const b=$("ppick");b.dataset.id=id;b.textContent=choix.has(id)?"Retirer de la liste":"Ajouter à la liste";
   $("pveil").hidden=false;
 }
-function closeViewer(){$("pveil").hidden=true}
+function closeViewer(){$("pveil").hidden=true;lpFired=false}
 $("pclose").addEventListener("click",closeViewer);
 $("pveil").addEventListener("click",e=>{if(e.target===$("pveil"))closeViewer()});
 $("ppick").addEventListener("click",()=>{const id=$("ppick").dataset.id;setChoice(id,!choix.has(id));closeViewer()});
@@ -721,6 +748,7 @@ function openEditor(id){
   if(p)$("fcat").value=catKey(p.cat,p.sub);
   $("fing").value=p?ingText(p.ing):"";
   photo=p&&p.photo?p.photo:null;paintPhoto();
+  $("flien").value=p&&p.lien?p.lien:"";
   $("fdel").hidden=!p;
   const d=$("fdel");d.textContent="Supprimer ce plat";delete d.dataset.armed;
   $("veil").hidden=false;
@@ -778,14 +806,16 @@ $("form").addEventListener("submit",e=>{
   for(const p of plats.values()){
     if(p.id!==editing&&p.nom.toLowerCase()===low){err("Ce plat existe déjà.");return}
   }
+  const lien=cleanUrl($("flien").value);
+  if(lien===null){err("Ce lien n'est pas valide. Colle l'adresse complète de la page.");return}
   const ing=parseIng($("fing").value);
   if(editing){
     const old=plats.get(editing);
     if(!old){closeEditor();return}
     const same=old.cat===cat&&(old.sub||"")===sub;
-    setDoc(doc(db,"plats",editing),{nom,cat,sub,ordre:same?old.ordre:maxOrdre()+1,ing,photo:photo||null}).catch(showError);
+    setDoc(doc(db,"plats",editing),{nom,cat,sub,ordre:same?old.ordre:maxOrdre()+1,ing,photo:photo||null,lien}).catch(showError);
   }else{
-    setDoc(doc(platsCol),{nom,cat,sub,ordre:maxOrdre()+1,ing,photo:photo||null}).catch(showError);
+    setDoc(doc(platsCol),{nom,cat,sub,ordre:maxOrdre()+1,ing,photo:photo||null,lien}).catch(showError);
   }
   closeEditor();
 });
